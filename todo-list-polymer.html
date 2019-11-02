@@ -1,0 +1,103 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-checkbox/paper-checkbox.html">
+
+<dom-module id="todo-list-polymer">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      .completed {
+        --paper-checkbox-label: {
+          text-decoration: line-through;
+        };
+        --paper-checkbox-label-checked-color: grey;
+      }
+
+      /* .completed {
+        --paper-checkbox-label: {
+          text-decoration: line-through;
+        };
+        --paper-checkbox-label-checked-color: grey;
+      } */
+    </style>
+    <h2>Tareas por hacer</h2>
+    <paper-input label="Nueva tarea" id="newLabelInput"></paper-input>
+    <paper-button on-click="_saveTask">Agregar</paper-button>
+    <ul>
+      <template is="dom-repeat" items="[[tasks]]" as="task">
+        <li>
+          <template is="dom-if" if="[[task.checked]]">
+            <paper-checkbox on-checked-changed="_checkTask" class="completed" checked="[[task.checked]]">
+                [[task.value]]
+            </paper-checkbox>
+          </template>
+          <template is="dom-if" if="[[!task.checked]]">
+              <paper-checkbox on-checked-changed="_checkTask" checked="[[task.checked]]">
+                  [[task.value]]
+              </paper-checkbox>
+            </template>
+          <paper-button on-click="_removeTask">
+            X
+          </paper-button>
+      </template>
+    </ul>
+  </template>
+
+  <script>
+    /**
+     * `todo-list-polymer`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class TodoListPolymer extends Polymer.Element {
+      static get is() { return 'todo-list-polymer'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'todo-list-polymer'
+          },
+          tasks: {
+            type: Array,
+            value: []
+          }
+        };
+      }
+
+      _saveTask(){
+        const input = this.$.newLabelInput;
+        if(input.value != ''){
+          const task = {
+            value: input.value,
+            checked: false
+          }
+          this.tasks = [...this.tasks, task];
+          input.value = '';
+        }
+      }
+
+      _checkTask(event){
+        const checked = event.currentTarget.checked;
+        event.model.task.checked = checked;
+        const taskModified = event.model.task;
+        this.tasks.splice(event.model.index, 1, taskModified);
+        this.tasks = [...this.tasks];
+      }
+
+      _removeTask(event){
+        const index = event.model.index;
+        this.tasks.splice(index, 1);
+        this.tasks = [...this.tasks];
+      }
+    }
+
+    window.customElements.define(TodoListPolymer.is, TodoListPolymer);
+  </script>
+</dom-module>
